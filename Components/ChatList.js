@@ -36,13 +36,13 @@ const ChatList = ({image, username, message}) => {
           <View
             style={{
               paddingLeft: 14,
-              borderBottomWidth: 0.6,
+              borderBottomWidth: 0.8,
               borderBottomColor: '#dddddd',
               paddingBottom: 18,
               width: '100%',
             }}>
             <Text
-              style={{fontWeight: '500', paddingBottom: 9, color: '#000000'}}>
+              style={{fontWeight: '500', paddingBottom: 6, color: '#000000'}}>
               {username}
             </Text>
             <Text>{message}</Text>

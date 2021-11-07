@@ -18,8 +18,13 @@ import {
 } from 'react-native-responsive-screen';
 import {TextInput} from 'react-native-paper';
 import {useForm, Controller} from 'react-hook-form';
+import auth from '@react-native-firebase/auth';
+import {useDispatch} from 'react-redux';
+import {login} from '../Redux/Slice/Userslice';
+import ButtonWithSpinner from '../Components/ButtonWithSpinner';
 
 const SignUp = ({navigation}) => {
+  const dispatch = useDispatch();
   const {
     control,
     handleSubmit,
@@ -27,8 +32,40 @@ const SignUp = ({navigation}) => {
   } = useForm();
 
   const [showlogo, setshowlogo] = useState(true);
+  const [signUpButton, setsignUpButton] = useState(true);
+  const [SpinButton, setSpinButton] = useState(false);
 
-  const onSubmit = data => {};
+  const onSubmit = data => {
+    setsignUpButton(false);
+    setSpinButton(true);
+    auth()
+      .createUserWithEmailAndPassword(data.Email, data.Password)
+      .then(userAuth => {
+        setSpinButton(false);
+        // console.log(user);
+        if (userAuth) {
+          auth().currentUser.updateProfile({
+            displayName: Username,
+          });
+          navigation.replace('AddPhoto');
+        }
+      })
+      .then(() => {
+        dispatch(
+          login({
+            username: data.Username,
+            email: userAuth.user.email,
+            user_id: userAuth.user.uid,
+          }),
+        );
+      })
+      .catch(err => {
+        console.log(err);
+        setSpinButton(false);
+        setsignUpButton(true);
+        alert(err.message);
+      });
+  };
   return (
     <View style={styles.LoginContainer}>
       <StatusBar backgroundColor="white" barStyle="dark-content" />
@@ -143,10 +180,14 @@ const SignUp = ({navigation}) => {
         </View>
 
         <View style={styles.ButtonStyles}>
-          <CustomButton
-            ButtonTitle="REGISTER"
-            onPress={handleSubmit(onSubmit)}
-          />
+          {signUpButton && (
+            <CustomButton
+              ButtonTitle="REGISTER"
+              onPress={handleSubmit(onSubmit)}
+            />
+          )}
+
+          {SpinButton && <ButtonWithSpinner />}
         </View>
       </View>
 

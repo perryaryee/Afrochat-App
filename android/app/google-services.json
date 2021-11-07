@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "539944464158",
+    "project_id": "afrochat-fa698",
+    "storage_bucket": "afrochat-fa698.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:539944464158:android:dde6e01b10045bb200630f",
+        "android_client_info": {
+          "package_name": "com.afrochat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "539944464158-cbue7gkvinnaqo2pabad5sr2ckkbgsm4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXpvY84OVdH2ahEr3TspIgskWRvvHIioM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "539944464158-cbue7gkvinnaqo2pabad5sr2ckkbgsm4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -5,7 +5,7 @@ import { Button } from 'react-native-elements';
 const ButtonWithSpinner = ({ onPress }) => {
     return (
         <Button
-            //   loading
+              loading
             onPress={onPress}
             buttonStyle={{
                 // width: '100%',

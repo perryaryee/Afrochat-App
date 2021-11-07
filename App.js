@@ -24,32 +24,42 @@ import AddPhoto from './Screens/AddPhoto';
 import AllUsers from './Screens/AllUsers';
 import PhotoCapture from './Screens/PhotoCapture';
 import ForgetPassword from './Screens/ForgetPassword';
+import {Provider} from 'react-redux';
+import Store from './Redux/Store/Store';
+import {PersistGate} from 'redux-persist/es/integration/react';
+import {persistStore} from 'redux-persist';
 
 const Stack = createStackNavigator();
+
+const persistor = persistStore(Store);
 
 const App = () => {
   // const user = null;
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="Login"
-        screenOptions={{
-          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-          headerShown: false,
-        }}>
-        <Stack.Screen name="Chat" component={ButtomTab} />
-        <Stack.Screen name="Chatroom" component={Chatroom} />
-        <Stack.Screen name="AllStatus" component={AllStatus} />
-        <Stack.Screen name="StatusView" component={StatusView} />
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="SignUp" component={SignUp} />
-        <Stack.Screen name="Search" component={Search} />
-        <Stack.Screen name="AddPhoto" component={AddPhoto} />
-        <Stack.Screen name="AllUsers" component={AllUsers} />
-        <Stack.Screen name="PhotoCapture" component={PhotoCapture} />
-        <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Provider store={Store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <NavigationContainer>
+          <Stack.Navigator
+            initialRouteName="Login"
+            screenOptions={{
+              cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+              headerShown: false,
+            }}>
+            <Stack.Screen name="Chat" component={ButtomTab} />
+            <Stack.Screen name="Chatroom" component={Chatroom} />
+            <Stack.Screen name="AllStatus" component={AllStatus} />
+            <Stack.Screen name="StatusView" component={StatusView} />
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="SignUp" component={SignUp} />
+            <Stack.Screen name="Search" component={Search} />
+            <Stack.Screen name="AddPhoto" component={AddPhoto} />
+            <Stack.Screen name="AllUsers" component={AllUsers} />
+            <Stack.Screen name="PhotoCapture" component={PhotoCapture} />
+            <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </PersistGate>
+    </Provider>
   );
 };
 

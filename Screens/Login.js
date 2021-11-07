@@ -8,6 +8,7 @@ import {
   StatusBar,
   Image,
   KeyboardAvoidingView,
+  Keyboard,
 } from 'react-native';
 import {Input, Button} from 'react-native-elements';
 import CustomButton from '../Components/CustomButton';
@@ -20,6 +21,8 @@ import {
 import {TextInput} from 'react-native-paper';
 import {useForm, Controller} from 'react-hook-form';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import ButtonWithSpinner from '../Components/ButtonWithSpinner';
+import auth from '@react-native-firebase/auth';
 
 const Login = () => {
   const navigation = useNavigation();
@@ -36,8 +39,33 @@ const Login = () => {
   } = useForm();
 
   const [showlogo, setshowlogo] = useState(true);
+  const [signUpButton, setsignUpButton] = useState(true);
+  const [SpinButton, setSpinButton] = useState(false);
 
-  const onSubmit = data => {};
+  const onSubmit = data => {
+    Keyboard.dismiss();
+    setsignUpButton(false);
+    setSpinButton(true);
+    auth()
+      .signInWithEmailAndPassword(data.Email, data.Password)
+      .then(user => {
+        setSpinButton(false);
+        if (user) {
+          navigation.replace('Chat');
+        }
+      })
+      .catch(err => {
+        if (err.code === 'auth/invalid-email') {
+          alert('Invalid email please try again');
+        } else if (err.code === 'auth/invalid-password') {
+          alert('Invalid Password..Please try again.');
+        }
+        console.log(err);
+        setSpinButton(false);
+        setsignUpButton(true);
+        alert(err.message);
+      });
+  };
   return (
     <View style={styles.LoginContainer}>
       <StatusBar backgroundColor="white" barStyle="dark-content" />
@@ -125,7 +153,13 @@ const Login = () => {
         </View>
 
         <View style={styles.ButtonStyles}>
-          <CustomButton ButtonTitle="LOGIN" onPress={handleSubmit(onSubmit)} />
+          {signUpButton && (
+            <CustomButton
+              ButtonTitle="LOGIN"
+              onPress={handleSubmit(onSubmit)}
+            />
+          )}
+          {SpinButton && <ButtonWithSpinner />}
           <View style={{marginTop: 13}}>
             <Button
               onPress={() => {
@@ -133,7 +167,7 @@ const Login = () => {
               }}
               buttonStyle={{
                 // width: '100%',
-                padding: 15,
+                padding: 13,
                 borderRadius: 25,
                 backgroundColor: '#ffffff',
                 borderColor: '#7119C7',
