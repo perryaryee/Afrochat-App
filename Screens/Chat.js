@@ -19,6 +19,10 @@ import CustomBottomSheet from '../Components/CustomBottomSheet';
 import NetInfo from '@react-native-community/netinfo';
 import CustomButton from '../Components/CustomButton';
 import {Input} from 'react-native-elements';
+import {useSelector} from 'react-redux';
+import {selectUser} from '../Redux/Slice/Userslice';
+import {selectModal} from '../Redux/Slice/Modalslice';
+import {Snackbar} from 'react-native-paper';
 
 // alwaysBounceVertical = true
 // automaticallyAdjustContentInsets
@@ -53,6 +57,7 @@ const BottomSheet = () => {
 
 const Chat = () => {
   const [netInfo, setNetInfo] = useState('');
+  const modal = useSelector(selectModal);
   useEffect(() => {
     // Subscribe to network state updates
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -75,6 +80,7 @@ const Chat = () => {
   const refRBSheet = useRef();
 
   const title = () => {
+    const userDetails = useSelector(selectUser);
     return (
       <View
         style={{
@@ -86,7 +92,8 @@ const Chat = () => {
           <StatusBar backgroundColor="white" barStyle="dark-content" />
           <TouchableOpacity>
             <Text style={{color: '#7119C7', fontSize: 18}}>
-              Welcome, Perry!
+              {`Welcome,${userDetails ? userDetails.email : `No user`}`}
+              {/* Welcome, Perry! */}
             </Text>
             {/* <AntDesign name="addusergroup" size={22} color="#7119C7" /> */}
           </TouchableOpacity>
@@ -142,26 +149,28 @@ const Chat = () => {
   const renderContent = () => {
     if (Chats.length === 0) {
       return (
-        <View style={styles.NocontentScreen}>
-          <AntDesign name="message1" size={80} color="#dddddd" />
-          <Text style={{textAlign: 'center', marginTop: 25}}>
-            No chat yet.. Click button to add chat
-          </Text>
-          <View
-            style={{
-              width: '100%',
-              marginTop: 25,
-              flex: 1,
-              paddingHorizontal: 15,
-            }}>
-            <CustomButton
-              ButtonTitle="ADD NEW CHAT"
-              onPress={() => {
-                refRBSheet.current.open();
-              }}
-            />
+        <>
+          <View style={styles.NocontentScreen}>
+            <AntDesign name="message1" size={80} color="#dddddd" />
+            <Text style={{textAlign: 'center', marginTop: 25}}>
+              No chat yet.. Click button to add chat
+            </Text>
+            <View
+              style={{
+                width: '100%',
+                marginTop: 25,
+                flex: 1,
+                paddingHorizontal: 15,
+              }}>
+              <CustomButton
+                ButtonTitle="ADD NEW CHAT"
+                onPress={() => {
+                  refRBSheet.current.open();
+                }}
+              />
+            </View>
           </View>
-        </View>
+        </>
       );
     } else {
       return (
@@ -207,6 +216,16 @@ const Chat = () => {
   return (
     <>
       <StatusBar barStyle="dark-content" backgroundColor="white" />
+      {modal && (
+        <Snackbar
+          visible={modal}
+          duration={5000}
+          style={{
+            backgroundColor: 'green',
+          }}>
+          You are logged In...
+        </Snackbar>
+      )}
       <CustomBottomSheet
         refRBSheet={refRBSheet}
         BottomSheetContent={BottomSheet}

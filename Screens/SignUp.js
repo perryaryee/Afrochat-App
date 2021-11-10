@@ -8,6 +8,7 @@ import {
   ScrollView,
   Image,
   KeyboardAvoidingView,
+  Keyboard,
 } from 'react-native';
 import {Input, Button} from 'react-native-elements';
 import CustomButton from '../Components/CustomButton';
@@ -22,6 +23,8 @@ import auth from '@react-native-firebase/auth';
 import {useDispatch} from 'react-redux';
 import {login} from '../Redux/Slice/Userslice';
 import ButtonWithSpinner from '../Components/ButtonWithSpinner';
+import {Close_Modal, Show_Modal} from '../Redux/Slice/Modalslice';
+import storage from '@react-native-firebase/storage';
 
 const SignUp = ({navigation}) => {
   const dispatch = useDispatch();
@@ -38,6 +41,7 @@ const SignUp = ({navigation}) => {
   const onSubmit = data => {
     setsignUpButton(false);
     setSpinButton(true);
+    Keyboard.dismiss();
     auth()
       .createUserWithEmailAndPassword(data.Email, data.Password)
       .then(userAuth => {
@@ -45,9 +49,13 @@ const SignUp = ({navigation}) => {
         // console.log(user);
         if (userAuth) {
           auth().currentUser.updateProfile({
-            displayName: Username,
+            displayName: data.Username,
           });
           navigation.replace('AddPhoto');
+          dispatch(Show_Modal());
+          setTimeout(() => {
+            dispatch(Close_Modal());
+          }, 3000);
         }
       })
       .then(() => {
@@ -60,7 +68,10 @@ const SignUp = ({navigation}) => {
         );
       })
       .catch(err => {
-        console.log(err);
+        // console.log(err);
+        if (error.code === 'auth/email-already-in-use') {
+          alert('Email already exist., Please try another email and continue');
+        }
         setSpinButton(false);
         setsignUpButton(true);
         alert(err.message);

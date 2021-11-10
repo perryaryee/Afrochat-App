@@ -23,9 +23,12 @@ import {useForm, Controller} from 'react-hook-form';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import ButtonWithSpinner from '../Components/ButtonWithSpinner';
 import auth from '@react-native-firebase/auth';
+import {Close_Modal, Show_Modal} from '../Redux/Slice/Modalslice';
+import {useDispatch} from 'react-redux';
 
 const Login = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const [focus, setfocuse] = useState({
     nameFocus: false,
     emaliFocus: false,
@@ -52,18 +55,28 @@ const Login = () => {
         setSpinButton(false);
         if (user) {
           navigation.replace('Chat');
+          dispatch(Show_Modal());
+          setTimeout(() => {
+            dispatch(Close_Modal());
+          }, 3000);
         }
       })
       .catch(err => {
         if (err.code === 'auth/invalid-email') {
           alert('Invalid email please try again');
-        } else if (err.code === 'auth/invalid-password') {
+        } else if (err.code === 'auth/wrong-password') {
           alert('Invalid Password..Please try again.');
+        } else if (err.code === 'auth/network-request-failed') {
+          alert(
+            'Connection timeout..please check your internet connection and try again.Thank you',
+          );
+        } else if (err.code === 'auth/user-not-found') {
+          alert('Invalid Email and Password please try again..');
         }
         console.log(err);
         setSpinButton(false);
         setsignUpButton(true);
-        alert(err.message);
+        // alert(err.message);
       });
   };
   return (
@@ -93,6 +106,7 @@ const Login = () => {
             }}
             render={({field: {onChange, onBlur, value}}) => (
               <TextInput
+                disabled={SpinButton ? true : false}
                 error={errors.Email && <Text>required field!!</Text>}
                 onFocus={() => {
                   setshowlogo(!showlogo);
@@ -118,6 +132,7 @@ const Login = () => {
             </Text>
           )}
           <Controller
+            disabled={SpinButton ? true : false}
             control={control}
             rules={{
               required: true,
