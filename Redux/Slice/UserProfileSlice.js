@@ -9,7 +9,7 @@ export const UserProfileSlice = createSlice({
 
   reducers: {
     userProfileDetails: (state, action) => {
-      state.user = action.payload;
+      state.userProfile = action.payload;
     },
 
     // UserImage: (state, action) => {
@@ -20,7 +20,7 @@ export const UserProfileSlice = createSlice({
 
 export const {userProfileDetails} = UserProfileSlice.actions;
 
-export const selectUser = state => state.userProfile.userProfile;
+export const selectProfileDetails = state => state.userProfile.userProfile;
 // export const selectUserImage = state => state.user.UserImage;
 
 export default UserProfileSlice.reducer;

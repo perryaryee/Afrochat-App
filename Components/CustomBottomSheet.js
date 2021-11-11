@@ -27,8 +27,8 @@ const CustomBottomSheet = ({BottomSheetContent, refRBSheet, onClose}) => {
           backgroundColor: 'gray',
         },
         container: {
-          borderTopLeftRadius: 10,
-          borderTopRightRadius: 10,
+          borderTopLeftRadius: 17,
+          borderTopRightRadius: 17,
         },
       }}>
       <ScrollView>

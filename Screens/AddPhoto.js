@@ -8,6 +8,8 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   Platform,
+  Image,
+  TouchableOpacity,
 } from 'react-native';
 import {CustomHeader} from '../Components/CustomHeader';
 import {Input, Avatar} from 'react-native-elements';
@@ -18,11 +20,19 @@ import {TextInput} from 'react-native-paper';
 import {useForm, Controller} from 'react-hook-form';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
+import {useDispatch} from 'react-redux';
+import {userProfileDetails} from '../Redux/Slice/UserProfileSlice';
+import noUser from '../assests/noUser.png';
 
 const AddPhoto = () => {
   const [showSpinnerButton, setshowSpinnerButton] = useState(false);
+  const [SaveButton, setSaveButton] = useState(true);
   const [showButton, setshowButton] = useState(true);
-  const [Image, setImage] = useState('');
+  const [showButton2, setshowButton2] = useState(true);
+  const [DownloadedUrl, setDownloadedUrl] = useState('');
+  const dispatch = useDispatch();
+  const [Image1, setImage] = useState('');
   const {
     control,
     handleSubmit,
@@ -41,11 +51,11 @@ const AddPhoto = () => {
     });
   };
 
-  const onSubmit = async data => {
+  const StoreData = async data => {
     Keyboard.dismiss();
-    setshowButton(false);
+    setshowButton2(false);
+    setSaveButton(false);
     setshowSpinnerButton(true);
-
     const uploadUri = Image;
     let filename = uploadUri.substring(uploadUri.lastIndexOf('/') + 1);
 
@@ -57,14 +67,87 @@ const AddPhoto = () => {
     try {
       await storage().ref(filename).putFile(uploadUri);
       const url = await storage().ref(filename).getDownloadURL();
-      console.log(url);
-      // const downloadedImageUri = await  filename.getD
+      setDownloadedUrl(url);
       setshowSpinnerButton(false);
-      setshowButton(true);
+      setshowButton2(true);
     } catch (error) {
       console.log(error);
     }
   };
+
+  const onSubmit = data => {
+    firestore()
+      .collection('Users')
+      .add({
+        username: data.Username,
+        status: data.Status,
+        profile: DownloadedUrl,
+      })
+      .then(success => {
+        if (success) {
+          alert('File uploaded to firestore Sucessfully');
+          navigation.navigate('Chat');
+        }
+      })
+      .then(() => {
+        dispatch(
+          userProfileDetails({
+            username: data.Username,
+            status: data.Status,
+            profile: DownloadedUrl,
+          }),
+        );
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+  // const onSubmit = async data => {
+  //   Keyboard.dismiss();
+  //   setshowButton(false);
+  //   setshowSpinnerButton(true);
+
+  //   // try {
+  //   //   const url = await storage().ref(filename).getDownloadURL();
+  //   //   const users = await firestore().collection('Users').add({
+  //   //     username: data.Username,
+  //   //     status: data.Status,
+  //   //     profile: url,
+  //   //   });
+  //   //   if (users) {
+  //   //     alert('user Successfully Added');
+  //   //   }
+  //   // } catch (error) {
+  //   //   console.log(error);
+  //   // }
+  // };
+
+  // const StoreData = () => {
+  //   firestore()
+  //     .collection('Users')
+  //     .add({
+  //       username: data.Username,
+  //       status: data.Status,
+  //       profile: url,
+  //     })
+  //     .then(success => {
+  //       if (success) {
+  //         alert('File uploaded Sucessfully');
+  //       }
+  //     })
+  //     .then(() => {
+  //       dispatch(
+  //         userProfileDetails({
+  //           username: data.Username,
+  //           status: data.Status,
+  //           profile: url,
+  //         }),
+  //       );
+  //     })
+  //     .catch(error => {
+  //       console.log(error);
+  //     });
+  // };
 
   const navigation = useNavigation();
   return (
@@ -161,16 +244,27 @@ const AddPhoto = () => {
           </Text>
         </View>
         <View style={{paddingHorizontal: 8}}>
-          <Avatar
-            // icon={}
-            source={{
-              uri: Image,
-            }}
-            size="large"
-            rounded
-            showEditButton={true}
-            onPress={UploadFile}
-          />
+          {!Image1 ? (
+            <TouchableOpacity onPress={UploadFile}>
+              <Image
+                source={noUser}
+                style={{
+                  maxWidth: 100,
+                  maxHeight: 100,
+                }}
+              />
+            </TouchableOpacity>
+          ) : (
+            <Avatar
+              // icon={{name: 'home'}}
+              source={{
+                uri: Image1,
+              }}
+              size={100}
+              rounded
+              // showEditButton={true}
+            />
+          )}
         </View>
       </View>
 
@@ -183,8 +277,16 @@ const AddPhoto = () => {
           bottom: 0,
           marginBottom: 15,
         }}>
+        {showButton2 && (
+          <View style={{marginTop: 13, marginBottom: 10}}>
+            <CustomButton ButtonTitle="Save" onPress={StoreData} />
+          </View>
+        )}
         {showButton && (
-          <CustomButton ButtonTitle="Complete Profile" onPress={onSubmit} />
+          <CustomButton
+            ButtonTitle="Complete Profile"
+            onPress={handleSubmit(onSubmit)}
+          />
         )}
         {showSpinnerButton && (
           <ButtonWithSpinner

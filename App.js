@@ -31,16 +31,15 @@ import {persistStore} from 'redux-persist';
 
 const Stack = createStackNavigator();
 
-const persistor = persistStore(Store);
-
 const App = () => {
+  const persistor = persistStore(Store);
   // const user = null;
   return (
     <Provider store={Store}>
       <PersistGate loading={null} persistor={persistor}>
         <NavigationContainer>
           <Stack.Navigator
-            initialRouteName="Login"
+            initialRouteName="Chat"
             screenOptions={{
               cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
               headerShown: false,
