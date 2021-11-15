@@ -56,7 +56,7 @@ const AddPhoto = () => {
     setshowButton2(false);
     setSaveButton(false);
     setshowSpinnerButton(true);
-    const uploadUri = Image;
+    const uploadUri = Image1;
     let filename = uploadUri.substring(uploadUri.lastIndexOf('/') + 1);
 
     // Adding Time stamp to image to avoid overriding.

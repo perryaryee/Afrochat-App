@@ -29,11 +29,6 @@ import {useDispatch} from 'react-redux';
 const Login = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const [focus, setfocuse] = useState({
-    nameFocus: false,
-    emaliFocus: false,
-    passwordFocus: false,
-  });
 
   const {
     control,
@@ -42,6 +37,7 @@ const Login = () => {
   } = useForm();
 
   const [showlogo, setshowlogo] = useState(true);
+  const [showLogo2, setshowLogo2] = useState(true);
   const [signUpButton, setsignUpButton] = useState(true);
   const [SpinButton, setSpinButton] = useState(false);
 
@@ -80,9 +76,13 @@ const Login = () => {
       });
   };
   return (
-    <View style={styles.LoginContainer}>
+    <View
+      style={styles.LoginContainer}
+      onPress={() => {
+        setshowlogo(!showlogo) || setshowLogo2(!showLogo2);
+      }}>
       <StatusBar backgroundColor="white" barStyle="dark-content" />
-      {showlogo && (
+      {showLogo2 && (
         <Image
           source={logo}
           style={{
@@ -92,11 +92,6 @@ const Login = () => {
           }}
         />
       )}
-      <View style={{paddingHorizontal: 50}}>
-        <Text style={{textAlign: 'center'}}>
-          Welcom to AfroChat..Make sure out Lgoin with your email and Password
-        </Text>
-      </View>
       <View style={styles.mainConatiner}>
         <View style={styles.InputStyles}>
           <Controller
@@ -108,9 +103,9 @@ const Login = () => {
               <TextInput
                 disabled={SpinButton ? true : false}
                 error={errors.Email && <Text>required field!!</Text>}
-                onFocus={() => {
-                  setshowlogo(!showlogo);
-                }}
+                // onFocus={() => {
+                //   setshowlogo(false);
+                // }}
                 label="Email"
                 outlineColor="#ddddde"
                 onBlur={onBlur}
@@ -139,9 +134,9 @@ const Login = () => {
             }}
             render={({field: {onChange, onBlur, value}}) => (
               <TextInput
-                onFocus={() => {
-                  setshowlogo(!showlogo);
-                }}
+                // onFocus={() => {
+                //   setshowLogo2(false);
+                // }}
                 label="Password"
                 outlineColor="#ddddde"
                 onBlur={onBlur}

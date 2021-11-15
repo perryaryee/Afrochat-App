@@ -1,14 +1,18 @@
-import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {StyleSheet, Text, View, Keyboard} from 'react-native';
 import {CustomHeader} from '../Components/CustomHeader';
 import {useNavigation} from '@react-navigation/core';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import CustomButton from '../Components/CustomButton';
 import {TextInput} from 'react-native-paper';
 import {useForm, Controller} from 'react-hook-form';
+import ButtonWithSpinner from '../Components/ButtonWithSpinner';
+import auth from '@react-native-firebase/auth';
 
 const ForgetPassword = () => {
   const navigation = useNavigation();
+  const [showButton, setshowButton] = useState(true);
+  const [showSpinButton, setshowSpinButton] = useState(false);
 
   const {
     control,
@@ -16,7 +20,22 @@ const ForgetPassword = () => {
     formState: {errors},
   } = useForm();
 
-  const onSubmit = data => {};
+  const onSubmit = async data => {
+    Keyboard.dismiss();
+    setshowButton(false);
+    setshowSpinButton(true);
+    try {
+      const user = await auth().sendPasswordResetEmail(data.Email);
+      setshowButton(true);
+      setshowSpinButton(false);
+      if (user) {
+        alert('User successfully created');
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   return (
     <View style={styles.containerStyles}>
       <CustomHeader
@@ -53,7 +72,7 @@ const ForgetPassword = () => {
                   marginHorizontal: 8,
                   backgroundColor: 'f5f5f5',
                 }}
-                error={errors.Password && <Text>This is required.</Text>}
+                error={errors.Email && <Text>This is required.</Text>}
               />
             )}
             name="Email"
@@ -67,10 +86,13 @@ const ForgetPassword = () => {
           )}
         </View>
         <View style={{marginTop: 25}}>
-          <CustomButton
-            ButtonTitle="RESERT PASSWORD"
-            onPress={handleSubmit(onSubmit)}
-          />
+          {showButton && (
+            <CustomButton
+              ButtonTitle="RESERT PASSWORD"
+              onPress={handleSubmit(onSubmit)}
+            />
+          )}
+          {showSpinButton && <ButtonWithSpinner />}
         </View>
       </View>
     </View>

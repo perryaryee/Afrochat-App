@@ -1,5 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View, ScrollView} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
 import {CustomHeader} from '../Components/CustomHeader';
 import {useNavigation} from '@react-navigation/core';
 import DammyData from '../DammyData.js/DammyData1';
@@ -9,14 +15,22 @@ import firestore from '@react-native-firebase/firestore';
 
 const AllUsers = () => {
   const [Users, setUsers] = useState([]);
+  const [loading, setloading] = useState(false);
+
   useEffect(() => {
     const fetchusers = async () => {
-      const usersCollection = await firestore().collection('Users').get();
-      setUsers(
-        usersCollection.docs.map(doc => {
-          doc.data();
-        }),
-      );
+      setloading(true);
+      await firestore()
+        .collection('Users')
+        .onSnapshot(snapshot => {
+          setloading(false);
+          setUsers(
+            snapshot.docs.map(doc => ({
+              id: doc.id,
+              data: doc.data(),
+            })),
+          );
+        });
     };
     fetchusers();
   }, []);
@@ -30,18 +44,25 @@ const AllUsers = () => {
         headerName="Users"
       />
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.MainConatainer}>
-          {Users.map(user => {
-            return (
-              <UsersLists
-                profile={user}
-                // profile={user.profile}
-                // username={user.username}
-                // status={user.status}
-              />
-            );
-          })}
-        </View>
+        {loading ? (
+          <View style={{marginTop: 10}}>
+            <ActivityIndicator size="large" color="#7119C7" />
+          </View>
+        ) : (
+          <View style={styles.MainConatainer}>
+            {Users.map(({id, data}) => {
+              return (
+                <UsersLists
+                  // id={id}
+                  key={id}
+                  profile={data.profile}
+                  username={data.username}
+                  status={data.status}
+                />
+              );
+            })}
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -56,5 +77,9 @@ const styles = StyleSheet.create({
   },
   MainConatainer: {
     padding: 15,
+  },
+  LoadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
   },
 });

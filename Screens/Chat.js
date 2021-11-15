@@ -44,30 +44,86 @@ import noUser from '../assests/noUser.png';
 const Chat = () => {
   const [netInfo, setNetInfo] = useState('');
   useEffect(() => {
-    // Subscribe to network state updates
     const unsubscribe = NetInfo.addEventListener(state => {
-      setNetInfo(
-        state.isConnected === true,
-        // `Connection type: ${state.type}
-        // Is connected?: ${state.isConnected}
-        // IP Address: ${state.details.ipAddress}`,
-      );
+      setNetInfo(state.isConnected === true);
     });
-
     return () => {
-      // Unsubscribe to network state updates
       unsubscribe();
     };
   }, []);
 
   const modal = useSelector(selectModal);
-  const [Groupname, setGroupname] = useState('');
+
   const [Image1, setImage] = useState('');
   const [showSpinnerButton, setshowSpinnerButton] = useState(false);
   const [showButton, setshowButton] = useState(true);
+  const [Groupname, setGroupname] = useState('');
   const navigation = useNavigation();
-  // const [chatname, setchatname] = useState(false);
   const refRBSheet = useRef();
+  const [DownloadedUrl, setDownloadedUrl] = useState('');
+  const [chat, setchat] = useState([]);
+
+  // const uploadPicture = async () => {
+  //   const uploadUri = Image1;
+  //   let filename = uploadUri.substring(uploadUri.lastIndexOf('/') + 1);
+
+  //   // Adding Time stamp to image to avoid overriding.
+  //   const extension = filename.split('.').pop();
+  //   const name = filename.split('.').slice(0, -1).join('.');
+  //   filename = name + Date.now() + '.' + extension;
+
+  //   try {
+  //     await storage().ref(filename).putFile(uploadUri);
+  //     const url = await storage().ref(filename).getDownloadURL();
+  //     setDownloadedUrl(url);
+  //     setshowSpinnerButton(false);
+  //     setshowButton2(true);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  const UploadFile = () => {
+    const uploadUri = Image1;
+    let filename = uploadUri.substring(uploadUri.lastIndexOf('/') + 1);
+
+    // Adding Time stamp to image to avoid overriding.
+    const extension = filename.split('.').pop();
+    const name = filename.split('.').slice(0, -1).join('.');
+    filename = name + Date.now() + '.' + extension;
+
+    ImagePicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: true,
+    }).then(image => {
+      console.log(image);
+      const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
+      setImage(imageUri);
+    });
+
+    storage()
+      .ref(filename)
+      .putFile(uploadUri)
+      .then(sucesss => {
+        if (sucesss) {
+          alert('Sucess');
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
+
+    storage()
+      .ref(filename)
+      .getDownloadURL()
+      .then(uri => {
+        setDownloadedUrl(uri);
+      })
+      .catch(() => {
+        console.log(err);
+      });
+  };
 
   const CreateGroup = () => {
     // Keyboard.dismiss();
@@ -78,8 +134,7 @@ const Chat = () => {
       .collection('Group Chats')
       .add({
         Groupname: Groupname,
-        // status: data.Status,
-        // profile: url,
+        profile: DownloadedUrl,
       })
       .then(success => {
         setshowSpinnerButton(false);
@@ -102,120 +157,6 @@ const Chat = () => {
       .catch(error => {
         console.log(error);
       });
-  };
-
-  const UploadFile = () => {
-    ImagePicker.openPicker({
-      width: 300,
-      height: 400,
-      cropping: true,
-    }).then(image => {
-      console.log(image);
-      const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
-      setImage(imageUri);
-    });
-  };
-
-  const BottomSheet = () => {
-    return (
-      <View>
-        <View
-          style={{
-            borderBottomColor: '#dddddd',
-            borderBottomWidth: 0.6,
-            paddingBottom: 15,
-          }}>
-          <Text
-            style={{
-              fontWeight: '700',
-              textAlign: 'center',
-              fontSize: 18,
-              color: '#000000',
-            }}>
-            Create new chat
-          </Text>
-        </View>
-        <View style={{paddingHorizontal: 10}}>
-          <View
-            style={{
-              marginTop: 8,
-              marginBottom: 10,
-              paddingHorizontal: 8,
-              flexDirection: 'row',
-            }}>
-            {!Image1 ? (
-              <Image
-                onPress={UploadFile}
-                source={noUser}
-                style={{
-                  maxWidth: 100,
-                  maxHeight: 100,
-                  flex: 4,
-                }}
-              />
-            ) : (
-              <Avatar
-                // icon={{name: 'home'}}
-                source={{
-                  uri: Image1,
-                }}
-                size="large"
-                rounded
-                // showEditButton={true}
-              />
-            )}
-            <Text style={{marginTop: 10, flex: 6}}>
-              Please provide a group Subject and optional icon, will be
-              appropirate if you add a group icon.Thank you.
-            </Text>
-          </View>
-          <TextInput
-            // style={{
-            //   marginHorizontal: 8,
-            //   backgroundColor: 'f5f5f5',
-            // }}
-            // placeholder="Group name!"
-            value={Groupname}
-            onChangeText={groupname => {
-              setGroupname(groupname);
-            }}
-            // label="Group name"
-            // outlineColor="#ddddde"
-          />
-          <View style={{marginTop: 25}}>
-            {showButton && (
-              <CustomButton
-                ButtonTitle="CREATE GROUP"
-                disabled={!Groupname}
-                onPress={CreateGroup}
-              />
-            )}
-            {showSpinnerButton && <ButtonWithSpinner />}
-
-            <Button
-              onPress={() => {
-                refRBSheet.current.close();
-                // navigation.navigate('ForgetPassword');
-              }}
-              buttonStyle={{
-                // width: '100%',
-                padding: 13,
-                borderRadius: 25,
-                backgroundColor: '#ffffff',
-                borderColor: '#7119C7',
-                borderWidth: 1.5,
-              }}
-              title="CANCEL"
-              titleStyle={{
-                color: '#7119C7',
-              }}
-              containerStyle={{marginTop: 20}}
-            />
-          </View>
-          {/* <Input placeholder="Add chat" containerStyle={{marginTop: 20}} /> */}
-        </View>
-      </View>
-    );
   };
 
   const title = () => {
@@ -279,7 +220,10 @@ const Chat = () => {
               }}>
               <Text style={{color: '#7119C7'}}>All chat</Text>
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('Newgroup');
+              }}>
               <Text style={{color: '#7119C7'}}>New Group</Text>
             </TouchableOpacity>
           </View>
@@ -308,7 +252,7 @@ const Chat = () => {
                 <CustomButton
                   ButtonTitle="ADD NEW CHAT"
                   onPress={() => {
-                    refRBSheet.current.open();
+                    navigation.navigate('Newgroup');
                   }}
                 />
               )}
@@ -317,17 +261,14 @@ const Chat = () => {
         </>
       );
     } else {
+      useEffect(() => {
+        const unsubscribe = firestore().collection('');
+      }, []);
       return (
         <View style={styles.HomeConatiner}>
           <StatusBar backgroundColor="white" barStyle="dark-content" />
-          {/* <View>
-            <Text style={{fontSize: 19, fontWeight: 'bold'}}>Messages</Text>
-          </View> */}
-
           <View>
-            {Chats.map(item => {
-              return <ChatList key={item.id} {...item} />;
-            })}
+            <ScrollView></ScrollView>
           </View>
         </View>
       );
@@ -370,13 +311,7 @@ const Chat = () => {
           You are logged In...
         </Snackbar>
       )}
-      <CustomBottomSheet
-        refRBSheet={refRBSheet}
-        BottomSheetContent={BottomSheet}
-        onClose={() => {
-          StatusBar.setBackgroundColor('#ffffff');
-        }}
-      />
+
       <ReactNativeParallaxHeader
         headerMinHeight={60}
         headerMaxHeight={175}
@@ -388,17 +323,8 @@ const Chat = () => {
         backgroundColor="white"
         // titleStyle={styles.titleStyle}
         title={title()}
-        // backgroundImage="https://i.imgur.com/1CNRvqZ.jpg"
-        // backgroundImageScale={1.2}
         renderNavBar={renderNavBar}
         renderContent={renderContent}
-        // containerStyle={styles.container}
-        // contentContainerStyle={styles.contentContainer}
-        // innerContainerStyle={styles.container}
-        // scrollViewProps={{
-        //   onScrollBeginDrag: () => setchatname(true),
-        //   onScrollEndDrag: () => setchatname(true),
-        // }}
       />
     </>
   );

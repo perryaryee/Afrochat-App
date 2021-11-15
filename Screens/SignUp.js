@@ -51,7 +51,7 @@ const SignUp = ({navigation}) => {
           auth().currentUser.updateProfile({
             displayName: data.Username,
           });
-          navigation.replace('AddPhoto');
+          navigation.replace('Chat');
           dispatch(Show_Modal());
           setTimeout(() => {
             dispatch(Close_Modal());
@@ -92,7 +92,7 @@ const SignUp = ({navigation}) => {
       )}
       <View style={styles.mainConatiner}>
         <View style={styles.InputStyles}>
-          <Controller
+          {/* <Controller
             control={control}
             rules={{
               required: true,
@@ -100,9 +100,9 @@ const SignUp = ({navigation}) => {
             render={({field: {onChange, onBlur, value}}) => (
               <TextInput
                 error={errors.Email && <Text>required field!!</Text>}
-                onFocus={() => {
-                  setshowlogo(!showlogo);
-                }}
+                // onFocus={() => {
+                //   setshowlogo(!showlogo);
+                // }}
                 label="Username"
                 outlineColor="#ddddde"
                 onBlur={onBlur}
@@ -123,7 +123,7 @@ const SignUp = ({navigation}) => {
             <Text style={{paddingLeft: 8, paddingTop: 8, color: 'red'}}>
               required field !!
             </Text>
-          )}
+          )} */}
           <Controller
             control={control}
             rules={{
@@ -132,9 +132,9 @@ const SignUp = ({navigation}) => {
             render={({field: {onChange, onBlur, value}}) => (
               <TextInput
                 error={errors.Email && <Text>required field!!</Text>}
-                onFocus={() => {
-                  setshowlogo(!showlogo);
-                }}
+                // onFocus={() => {
+                //   setshowlogo(!showlogo);
+                // }}
                 label="Email"
                 outlineColor="#ddddde"
                 onBlur={onBlur}
@@ -164,9 +164,9 @@ const SignUp = ({navigation}) => {
             render={({field: {onChange, onBlur, value}}) => (
               <TextInput
                 error={errors.Email && <Text>required field!!</Text>}
-                onFocus={() => {
-                  setshowlogo(!showlogo);
-                }}
+                // onFocus={() => {
+                //   setshowlogo(!showlogo);
+                // }}
                 label="Password"
                 outlineColor="#ddddde"
                 onBlur={onBlur}
